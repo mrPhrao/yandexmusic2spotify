@@ -1,4 +1,3 @@
-import os
 import yandex_music as ym
 import spotipy as spp
 from config import *
@@ -18,4 +17,3 @@ sp = spp.Spotify(
         scope= all_scopes,
     )
 )
-

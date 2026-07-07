@@ -16,9 +16,9 @@ def get_playlist(url:str) -> list[ym.Track]:
     uid = playlist.uid            
     playlist_title = playlist.title
 
-    print(f"Название: {playlist_title}")
-    print(f"kind: {pkind}")
-    print(f"uid (user_id): {uid}")
+    # print(f"Название: {playlist_title}")
+    # print(f"kind: {pkind}")
+    # print(f"uid (user_id): {uid}")
 
     playlist = client.users_playlists(kind=pkind, user_id=uid)
     tracks = playlist.tracks
@@ -92,7 +92,7 @@ def validate(ym_data:dict, sp_data:dict, invalid:dict, valid:list) -> None:
         invalid[sp_id] = mismatches
 
 """"Функция для плейлистов"""
-def playlist(name:str, uid:str) -> str:
+def playlist(name:str) -> str:
     playlists = sp.current_user_playlists()
 
     for playlist in playlists['items']:
@@ -100,12 +100,12 @@ def playlist(name:str, uid:str) -> str:
             print(f"Плейлист с именем {name} уже существует. Создать новый? (y/n)")
             answer = input().lower()
             if answer == "y":
-                playlist = sp.user_playlist_create(user=uid, name=name, public=False)
+                playlist = sp.current_user_playlist_create(name=name, public=True)
                 return playlist['id']
             else:
                 return playlist['id']
     
-    playlist = sp.user_playlist_create(user=uid, name=name, public=False)
+    playlist = sp.current_user_playlist_create(name=name, public=True)
     return playlist['id']
             
 """Функция подтверждения трека"""
@@ -127,7 +127,7 @@ def transfer(playlist_id: str, track_ids: list) -> None:
     
     print(f"\n➕ Добавление {total} треков в плейлист...")
     
-    chunk_size = 10
+    chunk_size = 100
     for i in range(0, total, chunk_size):
         chunk = track_ids[i:i+chunk_size]
         sp.playlist_add_items(playlist_id=playlist_id, items=chunk)

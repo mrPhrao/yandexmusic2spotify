@@ -25,9 +25,8 @@ def transfer_liked():
         print("⚠️ Нет треков для добавления!")
         return
 
-    ans = int(input("Добавить треки к лайкнутым, или создать новый плейлист? (1/2)"))
     try:
-        ans = int(input("Добавить треки к лайкнутым, или создать новый плейлист? (1/2): "))
+        ans = int(input("Добавить треки к лайкнутым, или создать новый плейлист? (1/2):"))
         if ans not in [1, 2]:
             print("❌ Неверный выбор. По умолчанию создаю плейлист.")
             ans = 2
@@ -36,7 +35,7 @@ def transfer_liked():
         ans = 2
         
     if ans == 1:
-        chunk_size = 10
+        chunk_size = 100
         for i in range(0, len(valid), chunk_size):
             chunk = valid[i:i+chunk_size]
             sp.current_user_saved_tracks_add(tracks=chunk)
@@ -44,7 +43,7 @@ def transfer_liked():
         playlist_name = input("Введите название плейлиста: ").strip()
         if not playlist_name:
             playlist_name = "Мне нравится (перенесённый)"
-        playlist_id = playlist(name=playlist_name, uid=sp.current_user()['id'])
+        playlist_id = playlist(name=playlist_name)
         transfer(playlist_id=playlist_id, track_ids=valid)
 
 
@@ -58,7 +57,6 @@ def transfer_playlist(playlist_url:str):
     uuid = playlist_url.split('/')[4]
     playl1st = client.playlist(uuid)
     playlist_title = playl1st.title
-    uid = sp.current_user()['id']
 
-    playlist_id = playlist(name=playlist_title, uid=uid)
+    playlist_id = playlist(name=playlist_title)
     transfer(playlist_id=playlist_id, track_ids=valid)
