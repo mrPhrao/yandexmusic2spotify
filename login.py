@@ -44,8 +44,9 @@ def save_credentials(credentials: dict) -> None:
     print("✅ Данные сохранены!")
 
 def yandex_login() -> ym.Client:
-    data = load_credentials()
     print("Авторизация Яндекс музыки")
+    data = load_credentials()
+    
     if not data:
         while True:
             token = input("Введи OAuth токен Яндекс Музыки:\n").replace(' ', '')
@@ -78,7 +79,9 @@ def yandex_login() -> ym.Client:
 
 
 def spotify_login() -> spp.Spotify:
+    print("Авторизация Spotify App")
     data = load_credentials()
+
     redirect_uri = 'http://127.0.0.1:8888/callback'
     all_scopes = ( 
         'playlist-read-private playlist-read-collaborative '
@@ -86,7 +89,6 @@ def spotify_login() -> spp.Spotify:
         'user-library-read user-library-modify ugc-image-upload'
     )
 
-    print("Авторизация Spotify App")
     if not data:
         while True:
             client_id = input("Введи CLIENT_ID:\n").replace(' ','')
