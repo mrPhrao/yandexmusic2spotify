@@ -7,16 +7,35 @@ import spotipy as spp
 storage = 'data.json'
 credentials = {}
 
+def validate_json(data: dict):
+    errors = []
+
+    token = data.get('TOKEN', None)
+    if not token:
+        errors.append('NO TOKEN')
+    client_id = data.get('CLIENT_ID', None)
+    if not client_id:
+        errors.append('NO CLIENT_ID')
+    client_secret = data.get('CLIENT_SECRET', None)
+    if not client_secret:
+        errors.append('NO CLIENT_SECRET')
+
+    return errors
+
 def load_credentials() -> dict | None:
     if not os.path.exists(storage):
         return None
-
     try:
         with open(storage, 'r', encoding='utf-8') as file:
             data = json.load(file)
-            return data
+            errors = validate_json(data=data)
+            if errors == []:
+                return data
+            else:
+                print("⚠️  Файл с данными повреждён. Будет запрошен новый ввод.")
+                return None
     except (json.JSONDecodeError, ValueError):
-        print("⚠️ Файл с данными повреждён. Будет запрошен новый ввод.")
+        print("⚠️  Файл с данными повреждён. Будет запрошен новый ввод.")
         return None
     
 def save_credentials(credentials: dict) -> None:
@@ -26,6 +45,7 @@ def save_credentials(credentials: dict) -> None:
 
 def yandex_login() -> ym.Client:
     data = load_credentials()
+    print("Авторизация Яндекс музыки")
     if not data:
         while True:
             token = input("Введи OAuth токен Яндекс Музыки:\n").replace(' ', '')
@@ -35,7 +55,7 @@ def yandex_login() -> ym.Client:
             try:
                 client = ym.Client(token=token)
                 user = client.account_status().account.first_name
-                print(f"✅ Авторизация Яндекс музыки успешна! Привет, {user}!")
+                print(f"✅ Авторизация Яндекс музыки успешна! Привет, {user}!\n")
                 credentials['TOKEN'] = token
                 return client
             except UnauthorizedError:
@@ -65,6 +85,8 @@ def spotify_login() -> spp.Spotify:
         'playlist-modify-public playlist-modify-private '
         'user-library-read user-library-modify ugc-image-upload'
     )
+
+    print("Авторизация Spotify App")
     if not data:
         while True:
             client_id = input("Введи CLIENT_ID:\n").replace(' ','')
@@ -85,7 +107,7 @@ def spotify_login() -> spp.Spotify:
                     )
                 )
                 user = sp.current_user()
-                print(f"✅ Авторизация Spotify успешна! Привет, {user['display_name']}!")
+                print(f"✅ Авторизация Spotify успешна! Привет, {user['display_name']}!\n")
                 credentials['CLIENT_ID'] = client_id
                 credentials['CLIENT_SECRET'] = client_secret
                 return sp
@@ -110,7 +132,7 @@ def spotify_login() -> spp.Spotify:
                 )
             )
             user = sp.current_user()
-            print(f"✅ Авторизация по сохранённым данным! Привет, {user['display_name']}!")
+            print(f"✅ Авторизация по сохранённым данным! Привет, {user['display_name']}!\n")
             return sp
         
         except spp.exceptions.SpotifyException:
